@@ -115,7 +115,7 @@ body.dim #vig{opacity:.85;box-shadow:inset 0 0 200px 80px rgba(0,0,0,.6)}
               </g>
             </g>
           </svg>
-          <p>딸이에요!</p>
+          <p>딸입니다!</p>
         </div>
         <canvas id="decoy" aria-label="두 번째 은박"></canvas>
         <canvas id="foil" aria-label="은박. 긁어서 결과를 확인하세요"></canvas>
@@ -279,17 +279,27 @@ function twist(){
   setTimeout(()=>{
     document.body.classList.remove('dim');
     win.classList.remove('shake');void win.offsetWidth;win.classList.add('shake');
-    phase=2;progress=0;moves=0;shown=0;interval=480;
-    say('blue','잠깐! 뭔가 이상해요','파란 그림도 은박이에요. 한 번 더 긁어 보세요!',true);
-    win.classList.add('p2');$('tb').classList.add('p2bar');setBar(0);$('stage').textContent='마지막 단계';
-    locked=false;startBeat();
+    say('tease','땡! 아들이 아니라...','',true);
+    beat(true);
+    try{navigator.vibrate&&navigator.vibrate([120,60,120])}catch(e){}
   },3000);
+  setTimeout(wipe,3700);
+}
+function wipe(){
+  const W=decoy.width,H=decoy.height,R=Math.hypot(W,H)/2,t0=performance.now(),dur=reduce?1:900;
+  dctx.globalCompositeOperation='destination-out';
+  const step=t=>{
+    const k=Math.max(0,Math.min(1,(t-t0)/dur)),e=1-(1-k)**3;
+    dctx.beginPath();dctx.arc(W/2,H*.45,R*e*1.05,0,7);dctx.fill();
+    if(k<1)requestAnimationFrame(step);else finale();
+  };
+  requestAnimationFrame(step);
 }
 function finale(){
   locked=true;drawing=false;stopBeat();
   decoy.classList.add('off');win.classList.add('done');setBar(1);
   $('stage').textContent='결과 공개';
-  say('pink','딸이에요!','옥지는 공주님이에요. 축하해 주셔서 고마워요!',true);
+  say('pink','딸입니다!','옥지는 공주님이에요. 축하해 주셔서 고마워요!',true);
   chime();
   try{navigator.vibrate&&navigator.vibrate([80,60,80,60,200])}catch(e){}
   $('after').classList.remove('hide');
