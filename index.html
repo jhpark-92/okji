@@ -7,21 +7,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
-/* VOICE occasion, a little party toy for two expecting parents
-   IDEA a Korean instant lottery ticket (즉석복권) with one big silver foil window
-   PICTURE the ticket; scratching the foil uncovers a drawn baby girl with a pink bow
-   COLOUR mint ground, white paper, red ticket band, silver foil, pink #ef5d8f underneath
+/* VOICE occasion, a little party toy with a twist for two expecting parents
+   IDEA a Korean instant lottery ticket (즉석복권): silver foil, then a blue "아들?" layer that turns out to be a second foil
+   PICTURE the scratch window; blue decoy baby under the foil, pink baby girl under the decoy
+   COLOUR mint ground, white paper, red ticket band, silver foil, decoy blue #2f7de1, final pink #ef5d8f
    TYPE Jua display + Gowun Dodum text
    LAYOUT one column, title then ticket; same on phone, ticket fills width */
-:root{color-scheme:light dark;--bg:light-dark(#dff2ea,#0f1d19);--ink:light-dark(#1b2a26,#eaf3ef);--paper:light-dark(#ffffff,#1d2a26);--line:light-dark(#d5e3dd,#33463f);--red:#e8364a;--muted:light-dark(#5b6d67,#a9bbb4);--pink:#ef5d8f}
+:root{color-scheme:light dark;--bg:light-dark(#dff2ea,#0f1d19);--ink:light-dark(#1b2a26,#eaf3ef);--paper:light-dark(#ffffff,#1d2a26);--line:light-dark(#d5e3dd,#33463f);--red:#e8364a;--muted:light-dark(#5b6d67,#a9bbb4);--pink:#ef5d8f;--blue:#2f7de1}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Gowun Dodum",system-ui,sans-serif;overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Gowun Dodum",system-ui,sans-serif;overflow-x:clip;word-break:keep-all}
 .wrap{max-width:560px;margin:0 auto;padding:clamp(20px,5vw,48px) 16px 40px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 h1{font:400 clamp(30px,8vw,46px)/1.1 Jua,sans-serif;letter-spacing:-.01em;margin:0 0 6px;text-wrap:balance}
 .sub{margin:0 0 22px;color:var(--muted)}
-.ticket{background:var(--paper);border-radius:18px;box-shadow:0 2px 0 var(--line),0 14px 30px -18px rgba(0,0,0,.35);overflow:hidden}
+.snd{flex:none;min-height:44px;padding:0 12px;font-size:14px;border-radius:22px}
+.ticket{background:var(--paper);border-radius:18px;box-shadow:0 2px 0 var(--line),0 14px 30px -18px rgba(0,0,0,.35);overflow:hidden;transition:transform .12s ease-out}
 .band{background:var(--red);color:#fff;padding:16px 20px 18px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;background-image:radial-gradient(rgba(255,255,255,.18) 1.2px,transparent 1.4px);background-size:12px 12px}
 .band b{font:400 26px/1.1 Jua,sans-serif}
 .band span{font-size:14px;opacity:.9;white-space:nowrap}
@@ -32,36 +34,53 @@ h1{font:400 clamp(30px,8vw,46px)/1.1 Jua,sans-serif;letter-spacing:-.01em;margin
 .prize{position:absolute;inset:0;background:radial-gradient(circle at 50% 38%,#ffe1ec,#f7a3c0 70%,#ef7fa6);display:grid;grid-template-rows:minmax(0,1fr) auto}
 .prize svg{width:100%;height:100%;display:block}
 .prize p{margin:0;padding:0 12px 18px;text-align:center;color:#fff;font:400 clamp(36px,11vw,58px)/1 Jua,sans-serif;text-shadow:0 3px 0 rgba(176,40,90,.35)}
-.win canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;transition:opacity .6s}
-.win.done canvas{opacity:0;pointer-events:none}
+.win canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;transition:opacity .7s}
+.win canvas.off{opacity:0;pointer-events:none}
+#decoy{pointer-events:none}
+.win.p2 #decoy{pointer-events:auto}
+.win.shake{animation:shake .5s}
+.win.done .baby{animation:bob 2.4s ease-in-out infinite;transform-origin:150px 200px}
 .bar{height:10px;border-radius:5px;background:var(--line);margin-top:14px;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--red);transition:width .2s}
+.bar i{display:block;height:100%;width:0;background:var(--red);transition:width .2s,background .3s}
+.p2bar .bar i{background:var(--blue)}
 .stat{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:14px;color:var(--muted)}
-.msg{margin:16px 0 0;padding:16px;border-radius:14px;background:var(--pink);color:#fff;text-align:center;font-size:17px;display:none}
-.msg.show{display:block;animation:pop .5s ease-out}
-.msg b{display:block;font:400 26px/1.2 Jua,sans-serif;margin-bottom:2px}
+.stat span:last-child{text-align:right}
+.msg{margin:16px 0 0;padding:16px;border-radius:14px;text-align:center;font-size:17px;color:#fff;background:var(--ink);min-height:64px}
+.msg b{display:block;font:400 24px/1.2 Jua,sans-serif;margin-bottom:2px}
+.msg.tease{background:light-dark(#eef2f0,#26332f);color:var(--ink)}
+.msg.blue{background:var(--blue)}
+.msg.pink{background:var(--pink)}
+.msg.pop{animation:pop .45s ease-out}
 .foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 20px 16px;font-size:13px;color:var(--muted);border-top:1px solid var(--line)}
 .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 button{font:inherit;font-size:16px;min-height:46px;padding:0 18px;border-radius:12px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
 button:focus-visible{outline:3px solid var(--red);outline-offset:2px}
 button:active{transform:translateY(1px)}
 .hide{display:none}
+#vig{position:fixed;inset:0;pointer-events:none;z-index:8;opacity:0;box-shadow:inset 0 0 120px 30px rgba(232,54,74,.55);transition:opacity .35s ease-out}
+body.beat #vig{opacity:var(--vi,.4);transition:none}
+body.beat .ticket{transform:scale(1.018);transition:none}
+body.dim #vig{opacity:.85;box-shadow:inset 0 0 200px 80px rgba(0,0,0,.6)}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9}
-@keyframes pop{from{transform:scale(.88);opacity:0}to{transform:none;opacity:1}}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
 @keyframes bob{50%{transform:translateY(-6px) rotate(-2deg)}}
-.win.done .baby{animation:bob 2.4s ease-in-out infinite;transform-origin:150px 200px}
-@media(prefers-reduced-motion:reduce){.msg.show,.win.done .baby{animation:none}.win canvas{transition:none}}
+@keyframes shake{20%{transform:translateX(-8px) rotate(-1deg)}40%{transform:translateX(7px) rotate(1deg)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+@media(prefers-reduced-motion:reduce){.msg.pop,.win.done .baby,.win.shake{animation:none}.win canvas{transition:none}body.beat .ticket{transform:none}}
 @media(max-width:400px){.band b{font-size:22px}}
 </style>
 </head>
 <body>
+<div id="vig" aria-hidden="true"></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div class="wrap">
-  <h1>옥지는 아들일까, 딸일까?</h1>
-  <p class="sub">손가락으로 은박을 끝까지 긁어 보세요.</p>
+  <div class="top">
+    <h1>옥지는 아들일까, 딸일까?</h1>
+    <button class="snd" id="snd" type="button" aria-pressed="true">소리 켜짐</button>
+  </div>
+  <p class="sub">손가락으로 은박을 끝까지 긁어 보세요. 소리를 켜 두면 더 떨려요.</p>
   <div class="ticket">
     <div class="band"><b>즉석 젠더 복권</b><span id="dt">제 1회</span></div>
-    <div class="body">
+    <div class="body" id="tb">
       <div class="win" id="win">
         <div class="prize" aria-hidden="true">
           <svg viewBox="0 0 300 260" preserveAspectRatio="xMidYMid meet">
@@ -98,11 +117,12 @@ button:active{transform:translateY(1px)}
           </svg>
           <p>딸이에요!</p>
         </div>
+        <canvas id="decoy" aria-label="두 번째 은박"></canvas>
         <canvas id="foil" aria-label="은박. 긁어서 결과를 확인하세요"></canvas>
       </div>
       <div class="bar"><i id="bar"></i></div>
-      <div class="stat"><span id="pct">0% 긁음</span><span>끝까지 긁으면 짠!</span></div>
-      <div class="msg" id="msg" aria-live="polite"><b>옥지는 공주님이에요</b>축하해 주셔서 고마워요!</div>
+      <div class="stat"><span id="pct">0% 긁음</span><span id="stage">끝까지 긁으면 결과가 나와요</span></div>
+      <div class="msg tease" id="msg" aria-live="polite"><b>두근두근</b>은박 아래에 뭐가 있을까요?</div>
       <div class="row hide" id="after"><button id="again" type="button">다시 긁기</button></div>
     </div>
     <div class="foot"><span>발행: 엄마 · 아빠</span><span>1등 상품: 평생의 행복</span></div>
@@ -112,71 +132,191 @@ button:active{transform:translateY(1px)}
 {
 const $=id=>document.getElementById(id);
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const win=$('win'),cv=$('foil'),ctx=cv.getContext('2d');
-const DONE_AT=.7;
-let started=false,finished=false,drawing=false,last=null,moves=0;
+const win=$('win'),foil=$('foil'),decoy=$('decoy');
+const fctx=foil.getContext('2d'),dctx=decoy.getContext('2d');
+const DONE1=.7,DONE2=.62;
+let phase=1,started=false,progress=0,drawing=false,last=null,moves=0,shown=-1,locked=false;
+let sound=true,ac=null,beatTimer=null,interval=950;
 
 {const d=new Date();$('dt').textContent=`제 1회 · ${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`}
 
-function paint(){
+/* decoy art: same baby, blue knit cap */
+const boySvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 260"><g fill="#fff" opacity=".8"><path d="M40 40l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z"/><path d="M252 64l4 9 10 1-7 6 2 10-9-5-9 5 2-10-7-6 10-1z"/><path d="M256 176l4 9 10 1-7 6 2 10-9-5-9 5 2-10-7-6 10-1z"/><circle cx="72" cy="104" r="3"/><circle cx="232" cy="124" r="3"/><circle cx="40" cy="186" r="3"/></g><ellipse cx="150" cy="252" rx="78" ry="40" fill="#fff"/><ellipse cx="150" cy="252" rx="78" ry="40" fill="#9cc6ff" opacity=".6"/><circle cx="78" cy="148" r="16" fill="#f6c3a6"/><circle cx="222" cy="148" r="16" fill="#f6c3a6"/><circle cx="150" cy="146" r="76" fill="#ffd9c2"/><path d="M72 132 A78 78 0 0 1 228 132 Z" fill="#2f7de1"/><rect x="70" y="118" width="160" height="22" rx="11" fill="#1f5fb8"/><g stroke="#2f7de1" stroke-width="3"><path d="M86 121v16M100 121v16M114 121v16M128 121v16M142 121v16M156 121v16M170 121v16M184 121v16M198 121v16M212 121v16"/></g><circle cx="150" cy="58" r="14" fill="#9cc6ff"/><path d="M118 156 Q126 146 134 156" fill="none" stroke="#4a3328" stroke-width="5" stroke-linecap="round"/><path d="M166 156 Q174 146 182 156" fill="none" stroke="#4a3328" stroke-width="5" stroke-linecap="round"/><ellipse cx="108" cy="176" rx="13" ry="8" fill="#ff9fbd" opacity=".55"/><ellipse cx="192" cy="176" rx="13" ry="8" fill="#ff9fbd" opacity=".55"/><path d="M140 184 Q150 194 160 184" fill="none" stroke="#c94a68" stroke-width="4" stroke-linecap="round"/></svg>`;
+const boyImg=new Image();
+boyImg.onload=()=>{if(!started)paintDecoy()};
+boyImg.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(boySvg);
+
+function size(cv){
   const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
   cv.width=Math.max(1,Math.round(r.width*dpr));cv.height=Math.max(1,Math.round(r.height*dpr));
-  const W=cv.width,H=cv.height;
-  ctx.globalCompositeOperation='source-over';
-  const g=ctx.createLinearGradient(0,0,W,H);
+  return dpr;
+}
+function paintDecoy(){
+  size(decoy);const W=decoy.width,H=decoy.height,x=dctx;
+  x.globalCompositeOperation='source-over';
+  const g=x.createRadialGradient(W/2,H*.38,0,W/2,H*.38,W*.8);
+  g.addColorStop(0,'#e3f1ff');g.addColorStop(.7,'#8dbdf5');g.addColorStop(1,'#5f9fe9');
+  x.fillStyle=g;x.fillRect(0,0,W,H);
+  if(boyImg.complete&&boyImg.naturalWidth){
+    const ah=H*.8,sc=Math.min(W/300,ah/260),iw=300*sc,ih=260*sc;
+    x.drawImage(boyImg,(W-iw)/2,(ah-ih)/2,iw,ih);
+  }
+  x.fillStyle='#fff';x.textAlign='center';x.textBaseline='alphabetic';
+  x.font=`${Math.round(W*.15)}px Jua, sans-serif`;
+  x.shadowColor='rgba(20,60,130,.35)';x.shadowOffsetY=W*.008;
+  x.fillText('아들...?',W/2,H*.95);x.shadowColor='transparent';
+}
+function paintFoil(){
+  size(foil);const W=foil.width,H=foil.height,x=fctx,dpr=Math.min(devicePixelRatio||1,2);
+  x.globalCompositeOperation='source-over';
+  const g=x.createLinearGradient(0,0,W,H);
   g.addColorStop(0,'#c4cad0');g.addColorStop(.35,'#eef1f3');g.addColorStop(.5,'#b3bac2');g.addColorStop(.7,'#e4e8eb');g.addColorStop(1,'#bfc5cc');
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  x.fillStyle=g;x.fillRect(0,0,W,H);
   let s=11;const rnd=()=>(s=s*16807%2147483647)/2147483647;
-  ctx.fillStyle='rgba(255,255,255,.5)';
-  for(let i=0;i<220;i++){ctx.beginPath();ctx.arc(rnd()*W,rnd()*H,(rnd()*1.8+.5)*dpr,0,7);ctx.fill()}
-  ctx.save();ctx.fillStyle='rgba(80,88,98,.16)';ctx.font=`${Math.round(W*.06)}px Jua, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-  for(let y=-1;y<8;y++)for(let x=-1;x<5;x++)ctx.fillText('긁어주세요',(x+(y%2)*.5)*W*.32,y*H*.14);
-  ctx.restore();
-  ctx.fillStyle='rgba(60,68,78,.8)';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.font=`${Math.round(W*.3)}px Jua, sans-serif`;ctx.fillText('?',W/2,H*.42);
-  ctx.font=`${Math.round(W*.075)}px Jua, sans-serif`;ctx.fillText('여기를 긁어 보세요',W/2,H*.68);
+  x.fillStyle='rgba(255,255,255,.5)';
+  for(let i=0;i<220;i++){x.beginPath();x.arc(rnd()*W,rnd()*H,(rnd()*1.8+.5)*dpr,0,7);x.fill()}
+  x.save();x.fillStyle='rgba(80,88,98,.16)';x.font=`${Math.round(W*.06)}px Jua, sans-serif`;x.textAlign='center';x.textBaseline='middle';
+  for(let y=-1;y<8;y++)for(let i=-1;i<5;i++)x.fillText('긁어주세요',(i+(y%2)*.5)*W*.32,y*H*.14);
+  x.restore();
+  x.fillStyle='rgba(60,68,78,.8)';x.textAlign='center';x.textBaseline='middle';
+  x.font=`${Math.round(W*.3)}px Jua, sans-serif`;x.fillText('?',W/2,H*.42);
+  x.font=`${Math.round(W*.075)}px Jua, sans-serif`;x.fillText('여기를 긁어 보세요',W/2,H*.68);
 }
 
-const pt=e=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]};
+/* sound + heartbeat */
+function audio(){
+  if(!sound)return null;
+  try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume()}catch(e){ac=null}
+  return ac;
+}
+function thump(t,f,v){
+  const a=ac,o=a.createOscillator(),g=a.createGain();
+  o.type='sine';o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.55,t+.14);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.2);
+  o.connect(g).connect(a.destination);o.start(t);o.stop(t+.22);
+}
+function beat(strong){
+  if(sound&&ac){try{const t=ac.currentTime+.01;thump(t,strong?70:62,strong?.95:.7);thump(t+.17,strong?58:52,strong?.7:.5)}catch(e){}}
+  try{navigator.vibrate&&navigator.vibrate(strong?[50,90,40]:[30,100,25])}catch(e){}
+  document.body.style.setProperty('--vi',String(.25+Math.min(.5,(phase===1?progress*.35:.35+progress*.25))));
+  document.body.classList.remove('beat');void document.body.offsetWidth;document.body.classList.add('beat');
+  setTimeout(()=>document.body.classList.remove('beat'),140);
+}
+function startBeat(){
+  stopBeat();
+  const loop=()=>{beat(false);beatTimer=setTimeout(loop,interval)};
+  loop();
+}
+function stopBeat(){clearTimeout(beatTimer);beatTimer=null}
+function chime(){
+  if(!sound||!ac)return;
+  try{
+    const t=ac.currentTime+.02;
+    [523.25,659.25,783.99,1046.5].forEach((f,i)=>{
+      const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;
+      g.gain.setValueAtTime(.0001,t+i*.11);g.gain.exponentialRampToValueAtTime(.35,t+i*.11+.02);g.gain.exponentialRampToValueAtTime(.0001,t+i*.11+.7);
+      o.connect(g).connect(ac.destination);o.start(t+i*.11);o.stop(t+i*.11+.75);
+    });
+  }catch(e){}
+}
+
+/* status text */
+const T1=[[0,'tease','두근두근','은박 아래에 뭐가 있을까요?'],[.12,'tease','어...?','파란색이 살짝 보이는데요?'],[.35,'tease','혹시...?','파란 모자... 설마 아들?!'],[.6,'tease','거의 다 왔어요','심장 소리 들리세요?']];
+const T2=[[0,'blue','한 번 더 긁어 보세요','파란 은박 아래에 진짜 결과가 있어요'],[.1,'tease','어?!','분홍색이... 보이는 것 같은데요?'],[.33,'tease','잠깐만요...','리본...? 설마...?!'],[.55,'tease','조금만 더!','숨 참으세요']];
+function say(cls,b,t,pop){const m=$('msg');m.className='msg '+cls+(pop?' pop':'');m.innerHTML=`<b>${b}</b>${t}`}
+function tease(){
+  const list=phase===1?T1:T2;let k=0;
+  list.forEach((r,i)=>{if(progress>=r[0])k=i});
+  if(k!==shown){shown=k;say(list[k][1],list[k][2],list[k][3],true)}
+}
+function setBar(p){
+  const v=Math.min(100,Math.round(p*100));
+  $('bar').style.width=v+'%';$('pct').textContent=`${v}% 긁음`;
+}
+
+/* scratching */
+const cur=()=>phase===1?foil:decoy;
+const pt=(cv,e)=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]};
 function scratch(p){
-  ctx.globalCompositeOperation='destination-out';ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=cv.width*.11;
-  ctx.beginPath();ctx.moveTo(...(last||p));ctx.lineTo(...p);ctx.stroke();last=p;
+  const cv=cur(),x=cv.getContext('2d');
+  x.globalCompositeOperation='destination-out';x.lineCap='round';x.lineJoin='round';x.lineWidth=cv.width*.11;
+  x.beginPath();x.moveTo(...(last||p));x.lineTo(...p);x.stroke();last=p;
   if(++moves%5===0)check();
 }
 function check(){
-  const d=ctx.getImageData(0,0,cv.width,cv.height).data;let clear=0,tot=0;
+  if(locked)return;
+  const cv=cur(),d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;let clear=0,tot=0;
   for(let k=3;k<d.length;k+=80){tot++;if(d[k]<40)clear++}
-  const f=clear/tot;
-  $('bar').style.width=Math.min(100,Math.round(f/DONE_AT*100))+'%';
-  $('pct').textContent=`${Math.min(100,Math.round(f/DONE_AT*100))}% 긁음`;
-  if(f>=DONE_AT)finish();
+  const goal=phase===1?DONE1:DONE2;
+  progress=Math.min(1,clear/tot/goal);setBar(progress);
+  interval=phase===1?950-progress*430:480-progress*220;
+  tease();
+  if(progress>=1){if(phase===1)twist();else finale()}
 }
-function finish(){
-  if(finished)return;finished=true;drawing=false;
-  win.classList.add('done');$('bar').style.width='100%';$('pct').textContent='100% 긁음';
-  setTimeout(()=>{$('msg').classList.add('show');$('after').classList.remove('hide')},500);
-  try{navigator.vibrate&&navigator.vibrate([60,40,120])}catch(e){}
+function down(e){
+  if(locked||e.currentTarget!==cur())return;
+  audio();
+  if(!started){started=true;startBeat()}
+  drawing=true;last=null;try{e.currentTarget.setPointerCapture(e.pointerId)}catch(_){}
+  scratch(pt(e.currentTarget,e));
+}
+[foil,decoy].forEach(cv=>{
+  cv.addEventListener('pointerdown',down);
+  cv.addEventListener('pointermove',e=>{if(drawing&&!locked&&cv===cur())scratch(pt(cv,e))});
+  const up=()=>{if(drawing){drawing=false;last=null;check()}};
+  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+});
+
+/* the fake-out */
+function twist(){
+  locked=true;drawing=false;stopBeat();
+  foil.classList.add('off');setBar(1);
+  say('blue','아들이에요...?','파란 모자를 쓴 아기가 나왔어요',true);
+  $('stage').textContent='1단계 완료';
+  setTimeout(()=>{document.body.classList.add('dim')},1300);
+  setTimeout(()=>{beat(true)},1700);
+  setTimeout(()=>{beat(true)},2300);
+  setTimeout(()=>{
+    document.body.classList.remove('dim');
+    win.classList.remove('shake');void win.offsetWidth;win.classList.add('shake');
+    phase=2;progress=0;moves=0;shown=0;interval=480;
+    say('blue','잠깐! 뭔가 이상해요','파란 그림도 은박이에요. 한 번 더 긁어 보세요!',true);
+    win.classList.add('p2');$('tb').classList.add('p2bar');setBar(0);$('stage').textContent='마지막 단계';
+    locked=false;startBeat();
+  },3000);
+}
+function finale(){
+  locked=true;drawing=false;stopBeat();
+  decoy.classList.add('off');win.classList.add('done');setBar(1);
+  $('stage').textContent='결과 공개';
+  say('pink','딸이에요!','옥지는 공주님이에요. 축하해 주셔서 고마워요!',true);
+  chime();
+  try{navigator.vibrate&&navigator.vibrate([80,60,80,60,200])}catch(e){}
+  $('after').classList.remove('hide');
   if(!reduce)confetti();
 }
 
-cv.addEventListener('pointerdown',e=>{if(finished)return;started=drawing=true;last=null;try{cv.setPointerCapture(e.pointerId)}catch(_){}scratch(pt(e))});
-cv.addEventListener('pointermove',e=>{if(drawing)scratch(pt(e))});
-const up=()=>{if(drawing){drawing=false;last=null;check()}};
-cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
-
-const ro=new ResizeObserver(()=>{if(!started)paint()});ro.observe(cv);
-if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(!started)paint()});
-
-$('again').addEventListener('click',()=>{
-  started=finished=false;moves=0;win.classList.remove('done');$('msg').classList.remove('show');$('after').classList.add('hide');
-  $('bar').style.width='0';$('pct').textContent='0% 긁음';paint();
+function reset(){
+  stopBeat();phase=1;started=false;progress=0;moves=0;shown=-1;locked=false;interval=950;
+  foil.classList.remove('off');decoy.classList.remove('off');win.classList.remove('done','p2','shake');$('tb').classList.remove('p2bar');
+  document.body.classList.remove('dim','beat');
+  $('after').classList.add('hide');$('stage').textContent='끝까지 긁으면 결과가 나와요';setBar(0);
+  paintDecoy();paintFoil();tease();
+}
+$('again').addEventListener('click',reset);
+$('snd').addEventListener('click',()=>{
+  sound=!sound;$('snd').textContent=sound?'소리 켜짐':'소리 꺼짐';$('snd').setAttribute('aria-pressed',String(sound));
+  if(sound)audio();
 });
+
+const ro=new ResizeObserver(()=>{if(!started){paintDecoy();paintFoil()}});ro.observe(win);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(!started){paintDecoy();paintFoil()}});
 
 function confetti(){
   const c=$('fx'),x=c.getContext('2d'),dpr=Math.min(devicePixelRatio||1,2);
   c.width=innerWidth*dpr;c.height=innerHeight*dpr;
   const cols=['#ef5d8f','#ffb3cc','#ffffff','#ffd23f','#f78db0','#d94077'];
-  const ps=Array.from({length:180},()=>({x:c.width*(.5+(Math.random()-.5)*.3),y:c.height*.45,vx:(Math.random()-.5)*16*dpr,vy:-(Math.random()*15+6)*dpr,r:(Math.random()*5+4)*dpr,a:Math.random()*6,va:(Math.random()-.5)*.3,col:cols[Math.floor(Math.random()*cols.length)]}));
+  const ps=Array.from({length:200},()=>({x:c.width*(.5+(Math.random()-.5)*.3),y:c.height*.45,vx:(Math.random()-.5)*17*dpr,vy:-(Math.random()*16+6)*dpr,r:(Math.random()*5+4)*dpr,a:Math.random()*6,va:(Math.random()-.5)*.3,col:cols[Math.floor(Math.random()*cols.length)]}));
   const t0=performance.now();
   const step=t=>{
     x.clearRect(0,0,c.width,c.height);
