@@ -372,7 +372,7 @@ function finale(){
   locked=true;drawing=false;stopBeat();
   decoy.classList.add('off');win.classList.add('done');setBar(1);
   $('stage').textContent='결과 공개';
-  say('pink','딸입니다!','옥지는 공주님이에요. 축하해 주세요!',true);
+  say('pink','딸입니다!','옥지는 공주님이에요.<br>축하해 주세요!',true);
   fanfare();
   try{navigator.vibrate&&navigator.vibrate([80,60,80,60,200])}catch(e){}
   $('after').classList.remove('hide');
